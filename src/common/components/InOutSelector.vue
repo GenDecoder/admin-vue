@@ -1,11 +1,17 @@
 <template>
     <div class="in-out-selector">        
-        <in-out-box :list="leftList" v-model="leftSelection"></in-out-box>
+        <in-out-box 
+            :list="leftList"
+            v-model="leftSelection"
+        ></in-out-box>
         <div class="arrow-container">
-            <div class="arrow" @click="move('right')"> > </div>
-            <div class="arrow" @click="move('left')"> < </div>
+            <div class="arrow" @click="moveToRight"> > </div>            
+            <div class="arrow" @click="moveToLeft"> < </div>
         </div>
-        <in-out-box :list="rightList" v-model="rightSelection"></in-out-box>
+        <in-out-box
+            :list="rightList"
+            v-model="rightSelection"
+        ></in-out-box>
     </div>
 </template>
 
@@ -13,35 +19,61 @@
     import InOutBox from "./in-out-selector/InOutBox"
     export default {
         name: "in-out-selector",
-        data() {
-            return {                
-                leftSelection: {},
-                rightSelection: {},
-            }
-        },
         components: {
             "in-out-box": InOutBox
-        },        
-        props: {            
-            leftList: {
+        },
+        props: {
+            // mixin for repeated properties in the 3 components
+            disabled: {
+                type: Boolean,
+                default: false
+            },
+            valueField: {
+                type: String,
+                required: true
+            },
+            displayField: {
+                type: String,
+                required: true
+            },
+            list: {
                 type: Array,
                 default: []
             },
-            rightList: {
+            selection: {
                 type: Array,
                 default: []
             }
         },
-        beforeCreate() {
-            // Here I should conver array in object form
-            // based on some configuration
-            // Only then pass to child components
+        data() {
+            return {
+                leftList: [], // equal list
+                rightList: [],
+
+                leftSelection: {},
+                rightSelection: {}// equal selection
+            }
+        },        
+        created() {// basically is a move from left to right 
+            var me = this;          
+            var item;
+            for(var i = 0; i < this.list.length; i += 1) {
+                item = this.list[i];
+                this.selection.indexOf(item[this.valueField]) === -1
+                    ? this.leftList.push(item)
+                    : this.rightList.push(item);
+            }
         },
-        methods: {
-            move (to) {
-                // this.leftList.reverse()
-                // this.leftList.splice(0, 1)
-                console.log("Move to " + to);                
+        computed: {
+
+        },
+        methods: {           
+            moveToRight() {
+                var me = this;
+                
+            },
+            moveToLeft() {
+                var me = this;
             }
         }
     }

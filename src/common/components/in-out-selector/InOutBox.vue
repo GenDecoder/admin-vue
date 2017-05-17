@@ -5,7 +5,12 @@
         <!--add ket events to the list-->
         <!--as well add sort functionality-->
         <div class="list">           
-            <in-out-card v-for="item of list" :key="item.id" :item="item" v-model="value"></in-out-card>          
+            <in-out-card
+                v-for="item of list"
+                :key="item.id"
+                :item="item"
+                v-model="value"
+            ></in-out-card>          
         </div>        
     </div>
 </template>
@@ -31,21 +36,15 @@
         },
         components: {
             "in-out-card": InOutCard
-        },
-        // methods: {
-        //     selected(item) {                
-        //         item.selected = !item.selected
-        //         this.$emit("input", "mario")
-        //     }
-        // },
+        },       
         watch: {
             checkAll(newVal, oldVal) {
                 
+            },
+            searchText(newVal, oldVal) {
+                
             }
-        },
-        created() {
-
-        }
+        }        
     }
 </script>
 
