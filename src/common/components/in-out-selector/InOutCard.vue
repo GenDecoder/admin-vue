@@ -1,12 +1,16 @@
 <template>
-    <div class="in-out-card" :class="{selected: selected}" @click="select">
-        <span> {{ item.name }} </span>
+    <div class="in-out-card" :class="{selected: selected, disabled: dom.disabled}" @click="select">
+        <span> {{ item[displayField] }} </span>
     </div>
 </template>
 
 <script>
     export default {
-        // try using inherit as well
+        inject: [
+            "dom",
+            "valueField",
+            "displayField"
+        ],
         props: {
              value: {
                 type: Object,
@@ -24,13 +28,16 @@
         },
         methods: {
             select() {
-                var id = this.item.id;
-                this.selected = !this.selected;
-                if (this.value.hasOwnProperty(id))
-                    delete this.value[id]
+                var me = this;
+                var value = me.item[me.valueField];
+                if (me.dom.disabled)
+                    return false;
+                me.selected = !me.selected;
+                if (me.value.hasOwnProperty(value))
+                    delete me.value[value]
                 else
-                    this.value[id] = id;                    
-                this.$emit("input", this.value);
+                    me.value[value] = value;                    
+                me.$emit("input", me.value);
             }
         }        
     }
@@ -38,12 +45,18 @@
 
 <style lang="scss" rel="stylesheet"> 
     .in-out-card {
-        border: solid;
-        cursor: pointer;
-        background: orange;
+        cursor: pointer;        
+        min-height: 30px;
+        border: solid 1px;
+        line-height: 30px;
         &.selected {
             color: white;
-            background-color: black;
+            border-color: black;
+            background-color: #2364a5;
+        }
+        &.disabled {
+            cursor: default;
+            background-color: lightgray;
         }
     }
 </style>

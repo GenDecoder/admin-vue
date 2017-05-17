@@ -1,11 +1,11 @@
 <template>
-    <div class="in-out-selector">        
-        <in-out-box 
+    <div class="in-out-selector">
+        <in-out-box
             :list="leftList"
             v-model="leftSelection"
         ></in-out-box>
         <div class="arrow-container">
-            <div class="arrow" @click="moveToRight"> > </div>            
+            <div class="arrow" @click="moveToRight"> > </div>
             <div class="arrow" @click="moveToLeft"> < </div>
         </div>
         <in-out-box
@@ -24,8 +24,24 @@
         components: {
             "in-out-box": InOutBox
         },
+        provide() {
+            return {
+                dom: Object.defineProperty({}, "disabled", { // change name, dom is not nice
+                    get: () => this.disabled
+                }),
+                valueField: this.valueField,
+                displayField: this.displayField
+            }
+        },
         props: {
-            // mixin for repeated properties in the 3 components
+            value: {
+                type: Array,
+                default: []
+            },
+            list: {
+                type: Array,
+                default: []
+            },
             disabled: {
                 type: Boolean,
                 default: false
@@ -37,51 +53,53 @@
             displayField: {
                 type: String,
                 required: true
-            },
-            list: {
-                type: Array,
-                default: []
-            },
-            selection: {
-                type: Array,
-                default: []
             }
         },
         data() {
             return {
-                leftList: [], // equal list
+                leftList: [], // equal to list
                 rightList: [],
-
                 leftSelection: {},
-                rightSelection: {}// equal selection
+                rightSelection: {} // equal to value
             }
-        },        
-        created() {// basically is a move from left to right 
-            var me = this;          
+        },
+        created() {// basically is a move from left to right
+            var me = this;
             var item;
             for(var i = 0; i < this.list.length; i += 1) {
                 item = this.list[i];
-                this.selection.indexOf(item[this.valueField]) === -1
+                this.value.indexOf(item[this.valueField]) === -1
                     ? this.leftList.push(item)
                     : this.rightList.push(item);
             }
         },
-        computed: {
-
+        watch: {
+            value() {
+                // But cleaning selection
+                // will perform a moveToRight
+                console.log("Changed");
+            },
+            list () {
+                // But cleaning selection
+                // will perform a moveToRight
+                console.log("Changed");
+            }
         },
-        methods: {           
+        computed: {},
+        methods: {
             moveToRight() {
                 var me = this;
-                
+                this.$emit("input");
             },
             moveToLeft() {
                 var me = this;
+                this.$emit("input");
             }
         }
     }
 </script>
 
-<style lang="scss" rel="stylesheet"> 
+<style lang="scss" rel="stylesheet">
     .in-out-selector {
         width: 700px;
         display: flex;
@@ -90,6 +108,6 @@
             .arrow {
                 cursor: pointer;
             }
-        }        
+        }
     }
 </style>

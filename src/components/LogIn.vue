@@ -1,12 +1,15 @@
 <template>
     <div> 
     <in-out-selector
-        :list="permissions"
-        :selection="selectedPermissionIds"
+        v-model="selectedPermissionIds"
+        :disabled="disabled"
+        :list="permissions"        
         value-field="id"
         display-field="name"
-        :disabled="true"
-    ></in-out-selector>    
+    ></in-out-selector>   
+
+    <input type="checkbox" v-model="disabled">
+
     </div>
 </template>
 
@@ -18,6 +21,7 @@
         ],
         data() {
             return {
+                disabled: false,
                 permissions: [],
                 selectedPermissionIds: []
             }

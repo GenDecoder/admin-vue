@@ -7,8 +7,8 @@
         <div class="list">           
             <in-out-card
                 v-for="item of list"
-                :key="item.id"
                 :item="item"
+                :key="item[valueField]"
                 v-model="value"
             ></in-out-card>          
         </div>        
@@ -18,6 +18,7 @@
 <script>
     import InOutCard from "./InOutCard"
     export default {
+        inject: ["valueField"],
         props: {
             value: {
                 type: Object,
@@ -51,12 +52,12 @@
 <style lang="scss" rel="stylesheet"> 
     .in-out-box {
         width: 100%;
-        border: solid 1px;
+        // border: solid 1px;
         input {
             width: 100%;
         }
         .list {
-            border: solid 1px;           
+            // border: solid 1px;           
         }
     }
 </style>
