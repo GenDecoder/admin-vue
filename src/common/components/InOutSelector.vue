@@ -16,6 +16,8 @@
 </template>
 
 <script>
+
+// instead of passing the selection as a model, pass it as a :
     import InOutBox from "./in-out-selector/InOutBox"
     export default {
         name: "in-out-selector",

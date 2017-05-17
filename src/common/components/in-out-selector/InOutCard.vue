@@ -6,6 +6,7 @@
 
 <script>
     export default {
+        // try using inherit as well
         props: {
              value: {
                 type: Object,
