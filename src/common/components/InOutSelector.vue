@@ -5,8 +5,8 @@
             v-model="leftSelection"
         ></in-out-box>
         <div class="arrow-container">
-            <div class="arrow" @click="moveToRight"> > </div>
-            <div class="arrow" @click="moveToLeft"> < </div>
+            <button class="arrow" :disabled="disabled || !leftSelection.length" @click="moveToRight"> toRight </button>
+            <button class="arrow" :disabled="disabled || !rightSelection.length" @click="moveToLeft"> toLeft </button>
         </div>
         <in-out-box
             :list="rightList"
@@ -16,87 +16,119 @@
 </template>
 
 <script>
+/**
+*   Consider this component as a field,
+*   so the key is to update the "value" via "$emit"
+ */
+import InOutBox from "./in-out-selector/InOutBox"
+export default {
+    name: "in-out-selector",
+    components: {
+        "in-out-box": InOutBox
+    },
+    provide() {
+        return {
+            state: Object.defineProperty({}, "disabled", {
+                get: () => this.disabled
+            }),
+            valueField: this.valueField,
+            displayField: this.displayField
+        }
+    },
+    props: {
+        value: {
+            type: Array,
+            default: []
+        },
+        list: {
+            type: Array,
+            default: []
+        },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
+        valueField: {
+            type: String,
+            required: true
+        },
+        displayField: {
+            type: String,
+            required: true
+        }
+    },
+    data() {
+        var me = this;
+        return {
+            rightList: [],
+            rightSelection: [],
+            leftList: me.list.slice(0),
+            leftSelection: me.value.slice(0)
+        }
+    },
+    created() {// basically is a move from left to right
+        var me = this;
+        me.moveToRight();
+        me.rightSelection = [];
+    },
+    // watch: {
+    //     value() {
+    //         // But cleaning selection
+    //         // will perform a moveToRight
+    //         console.log("Changed");
+    //     },
+    //     list () {
+    //         // But cleaning selection
+    //         // will perform a moveToRight
+    //         console.log("Changed");
+    //     }
+    // },   
+    methods: {        
+        reset() {
 
-// instead of passing the selection as a model, pass it as a :
-    import InOutBox from "./in-out-selector/InOutBox"
-    export default {
-        name: "in-out-selector",
-        components: {
-            "in-out-box": InOutBox
         },
-        provide() {
-            return {
-                dom: Object.defineProperty({}, "disabled", { // change name, dom is not nice
-                    get: () => this.disabled
-                }),
-                valueField: this.valueField,
-                displayField: this.displayField
-            }
-        },
-        props: {
-            value: {
-                type: Array,
-                default: []
-            },
-            list: {
-                type: Array,
-                default: []
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            },
-            valueField: {
-                type: String,
-                required: true
-            },
-            displayField: {
-                type: String,
-                required: true
-            }
-        },
-        data() {
-            return {
-                leftList: [], // equal to list
-                rightList: [],
-                leftSelection: {},
-                rightSelection: {} // equal to value
-            }
-        },
-        created() {// basically is a move from left to right
+        move(config) {
             var me = this;
-            var item;
-            for(var i = 0; i < this.list.length; i += 1) {
-                item = this.list[i];
-                this.value.indexOf(item[this.valueField]) === -1
-                    ? this.leftList.push(item)
-                    : this.rightList.push(item);
+            var toList = config.toList;
+            var fromList = config.fromList;
+            var toSelection = config.toSelection;
+            var fromSelection = config.fromSelection;
+            var index = fromList.length;
+            while (index --) {
+                var item = fromList[index];
+                var id = item[me.valueField];
+                var selIndex = fromSelection.indexOf(id);
+                if (selIndex !== -1) {
+                    toList.push(item);
+                    toSelection.push(id);
+                    fromList.splice(index, 1);
+                    fromSelection.splice(selIndex, 1);
+                }
             }
+            me.$emit("input", me.rightList.map(function getValue(item) {
+                return item[me.valueField];
+            }, me));
         },
-        watch: {
-            value() {
-                // But cleaning selection
-                // will perform a moveToRight
-                console.log("Changed");
-            },
-            list () {
-                // But cleaning selection
-                // will perform a moveToRight
-                console.log("Changed");
-            }
+        moveToRight() {
+            var me = this;
+            me.move({
+                toList: me.rightList,
+                fromList: me.leftList,
+                toSelection: me.rightSelection,
+                fromSelection: me.leftSelection
+            });
         },
-        computed: {},
-        methods: {
-            moveToRight() {
-                var me = this;
-                this.$emit("input");
-            },
-            moveToLeft() {
-                var me = this;
-                this.$emit("input");
-            }
+        moveToLeft() {
+            var me = this;
+            me.move({
+                toList: me.leftList,
+                fromList: me.rightList,
+                toSelection: me.leftSelection,
+                fromSelection: me.rightSelection
+            });
         }
     }
+}
 </script>
 
 <style lang="scss" rel="stylesheet">
@@ -105,7 +137,7 @@
         display: flex;
         .arrow-container {
             width: 100px;
-            .arrow {
+            .arrow {                
                 cursor: pointer;
             }
         }

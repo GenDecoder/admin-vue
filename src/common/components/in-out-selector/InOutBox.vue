@@ -21,8 +21,8 @@
         inject: ["valueField"],
         props: {
             value: {
-                type: Object,
-                default: {}
+                type: Array,
+                default: []
             },
             list: {
                 type: Array,
@@ -35,15 +35,31 @@
                 checkAll: false
             }
         },
+        methods: {
+            clear() {
+                // BEST WAY TO CLEAN ARRAY IN VUE (DOES NOT AFFECT THE COMPUTED)
+                this.value.splice(0, this.value.length);
+            }
+        },
         components: {
             "in-out-card": InOutCard
-        },       
+        },
+        // computed: {
+        //     checkAll() {
+        //         return this.list.length === this.value.length; // que sean mayor a cero
+        //     }
+        // },
         watch: {
             checkAll(newVal, oldVal) {
-                
+                this.clear();
+                if (newVal)
+                    for (var i = 0; i < this.list.length; i += 1) {
+                        var item = this.list[i];
+                        this.value.push(item[this.valueField]);
+                    }                
             },
             searchText(newVal, oldVal) {
-                
+                this.clear();
             }
         }        
     }

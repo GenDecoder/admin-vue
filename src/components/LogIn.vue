@@ -3,10 +3,12 @@
     <in-out-selector
         v-model="selectedPermissionIds"
         :disabled="disabled"
-        :list="permissions"        
+        :list="permissions"
         value-field="id"
         display-field="name"
     ></in-out-selector>   
+
+    <h1>{{ selectedPermissionIds }}</h1>
 
     <input type="checkbox" v-model="disabled">
 
@@ -42,7 +44,7 @@
                     id: 3,
                     name: "DELAYED"
                 });
-            }, 0);
+            }, 1000);
         }
     }
 </script>

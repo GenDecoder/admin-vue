@@ -1,5 +1,5 @@
 <template>
-    <div class="in-out-card" :class="{selected: selected, disabled: dom.disabled}" @click="select">
+    <div class="in-out-card" :class="{selected: selected, disabled: state.disabled}" @click="select">
         <span> {{ item[displayField] }} </span>
     </div>
 </template>
@@ -7,36 +7,45 @@
 <script>
     export default {
         inject: [
-            "dom",
+            "state",
             "valueField",
             "displayField"
         ],
         props: {
              value: {
-                type: Object,
-                default: {}
+                type: Array,
+                default: []
             },
             item: {
                 type: Object,
                 default: {}
             }
         },
-        data() {
-            return {
-                selected: false
+        // data() {
+        //     return {
+        //         selected: false
+        //     }
+        // },
+        computed: {
+            selected() {
+                var me = this;
+                return me.value.indexOf(me.item[me.valueField]) !== -1;
             }
         },
         methods: {
             select() {
                 var me = this;
                 var value = me.item[me.valueField];
-                if (me.dom.disabled)
+                var index = me.value.indexOf(value);
+
+                if (me.state.disabled)
                     return false;
+
                 me.selected = !me.selected;
-                if (me.value.hasOwnProperty(value))
-                    delete me.value[value]
+                if (index !== -1)
+                    me.value.splice(index, 1);
                 else
-                    me.value[value] = value;                    
+                    me.value.push(value);
                 me.$emit("input", me.value);
             }
         }        
