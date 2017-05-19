@@ -1,7 +1,11 @@
 <template>
-    <div class="in-out-card" :class="{selected: selected, disabled: state.disabled}" @click="select">
-        <span> {{ item[displayField] }} </span>
-    </div>
+    <button 
+        class="in-out-card"
+        v-if="!hidden"
+        @click="selectDeselect"
+        :disabled="state.disabled"
+        :class="{selected: selected, disabled: state.disabled}"
+    > {{ item[displayField] }} </button>
 </template>
 
 <script>
@@ -12,35 +16,43 @@
             "displayField"
         ],
         props: {
-             value: {
+             value: { // selection
                 type: Array,
                 default: []
             },
             item: {
                 type: Object,
                 default: {}
+            },
+            searchText: {
+                type: String,
+                default: ""
             }
-        },
-        // data() {
-        //     return {
-        //         selected: false
-        //     }
-        // },
+        },      
         computed: {
+            hidden() {
+                var me = this;
+                var isHidden = me.item[me.displayField].toLowerCase().indexOf(me.searchText.trim()) === -1
+                // isHidden && 
+                me.$emit("adjustSize", isHidden ? -1 : 1);
+                console.log(isHidden);
+                return isHidden;
+            },
             selected() {
                 var me = this;
                 return me.value.indexOf(me.item[me.valueField]) !== -1;
             }
         },
+        // watch: {
+        //     selected(newVal, oldVal) {
+
+        //     }
+        // },
         methods: {
-            select() {
+            selectDeselect() {
                 var me = this;
                 var value = me.item[me.valueField];
-                var index = me.value.indexOf(value);
-
-                if (me.state.disabled)
-                    return false;
-
+                var index = me.value.indexOf(value);                
                 me.selected = !me.selected;
                 if (index !== -1)
                     me.value.splice(index, 1);

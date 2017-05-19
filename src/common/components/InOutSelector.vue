@@ -94,7 +94,7 @@ export default {
             var toSelection = config.toSelection;
             var fromSelection = config.fromSelection;
             var index = fromList.length;
-            while (index --) {
+            while (index --) { // all vue specific solutions methods in mixins
                 var item = fromList[index];
                 var id = item[me.valueField];
                 var selIndex = fromSelection.indexOf(id);

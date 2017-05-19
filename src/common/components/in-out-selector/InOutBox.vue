@@ -8,8 +8,10 @@
             <in-out-card
                 v-for="item of list"
                 :item="item"
-                :key="item[valueField]"
                 v-model="value"
+                :key="item[valueField]"
+                :searchText="searchText"
+                @adjustSize="adjustSize"
             ></in-out-card>          
         </div>        
     </div>
@@ -18,7 +20,7 @@
 <script>
     import InOutCard from "./InOutCard"
     export default {
-        inject: ["valueField"],
+        inject: ["valueField", "displayField"],
         props: {
             value: {
                 type: Array,
@@ -31,6 +33,7 @@
         },
         data() {
             return {
+                size: 0,
                 searchText: ""
             }
         },
@@ -41,12 +44,16 @@
             },
             checkUnCheckAll(e) {
                 var me = this;
+                var i;
                 me.clear();
                 if (e.target.checked)
-                    for (var i = 0; i < me.list.length; i += 1) {
-                        var item = me.list[i];
-                        me.value.push(item[me.valueField]);
-                    }     
+                    for (i = 0; i < me.list.length; i += 1) 
+                        me.value.push(me.list[i][me.valueField]);
+            },
+            adjustSize(plus) {
+                var me = this;
+                me.size += plus;
+                console.log(plus)
             }
         },
         components: {
@@ -54,14 +61,19 @@
         },
         computed: {
             checkAll() {
-                return this.list.length > 0 && this.list.length === this.value.length;
+                return this.size > 0 && this.size === this.value.length;
             }
         },
-        watch: {           
-            searchText(newVal, oldVal) {
-                this.clear();
-            }
-        }        
+        // watch: {           
+        //     searchText(newVal, oldVal) {
+        //         var me = this;
+        //         me.clear();
+        //         me.list.filter(item => {
+        //             console.log(item);
+        //             return item[me.displayField].toLowerCase().indexOf(newVal.toLowerCase()) > -1
+        //         })
+        //     }
+        // }        
     }
 </script>
 
