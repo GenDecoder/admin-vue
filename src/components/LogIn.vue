@@ -14,21 +14,20 @@
 
     </div>
 </template>
-
 <script>
     import lifeCycle from '@/mixins/lifeCycle'
     export default {
         mixins: [
             lifeCycle
         ],
-        data() {
+        data () {
             return {
                 disabled: false,
                 permissions: [],
                 selectedPermissionIds: []
             }
         },
-        created() {
+        created () {
             var me = this;
             me.permissions.push({
                 id: 1,
@@ -36,6 +35,12 @@
             }, {
                 id: 2,
                 name: "Dealer Management"
+            }, {
+                id: 3,
+                name: "ZZZZ"
+            }, {
+                id: 4,
+                name: "01023"
             });
             me.selectedPermissionIds.push(1);
             me.selectedPermissionIds.push(2);

@@ -1,20 +1,23 @@
 <template>
-    <div class="in-out-selector">
+    <div 
+        class="in-out-selector"
+        @keydown.left.stop="moveToLeft"
+        @keydown.right.stop="moveToRight"
+    >
         <in-out-box
             :list="leftList"
-            v-model="leftSelection"
+            :selection="leftSelection"
         ></in-out-box>
         <div class="arrow-container">
-            <button class="arrow" :disabled="disabled || !leftSelection.length" @click="moveToRight"> toRight </button>
-            <button class="arrow" :disabled="disabled || !rightSelection.length" @click="moveToLeft"> toLeft </button>
-        </div>
+            <button class="arrow" :disabled="disabled || !leftSelection.length" @click="moveToRight"> TO RIGHT </button>
+            <button class="arrow" :disabled="disabled || !rightSelection.length" @click="moveToLeft"> TO LEFT </button>
+        </div>        
         <in-out-box
             :list="rightList"
-            v-model="rightSelection"
+            :selection="rightSelection"
         ></in-out-box>
     </div>
 </template>
-
 <script>
 /**
 *   Consider this component as a field,
@@ -27,9 +30,10 @@ export default {
         "in-out-box": InOutBox
     },
     provide() {
+        var me = this;
         return {
             state: Object.defineProperty({}, "disabled", {
-                get: () => this.disabled
+                get: () => me.disabled
                 // set(value) {
                 //     console.log(value);
                 // }
@@ -60,7 +64,7 @@ export default {
             required: true
         }
     },
-    data() {
+    data () {
         var me = this;
         return {
             rightList: [],
@@ -69,28 +73,14 @@ export default {
             leftSelection: me.value.slice(0)
         }
     },
-    created() {// basically is a move from left to right
-        var me = this;
+    created () {
+        var me = this;        
         me.moveToRight();
         me.rightSelection = [];
-    },
-    // watch: {
-    //     value() {
-    //         // But cleaning selection
-    //         // will perform a moveToRight
-    //         console.log("Changed");
-    //     },
-    //     list () {
-    //         // But cleaning selection
-    //         // will perform a moveToRight
-    //         console.log("Changed");
-    //     }
-    // },   
+        me.sortBy(me.leftList, me.displayField);
+    },  
     methods: {        
-        reset() {
-
-        },
-        move(config) {
+        move (config) {
             var me = this;
             var toList = config.toList;
             var fromList = config.fromList;
@@ -108,11 +98,13 @@ export default {
                     fromSelection.splice(selIndex, 1);
                 }
             }
-            me.$emit("input", me.rightList.map(function getValue(item) {
-                return item[me.valueField];
-            }, me));
+            me.sortBy(toList, me.displayField);            
+            me.$emit("input", me.rightList.map(item => item[me.valueField]));
+            // set focus after move
+            // all buttons (cards) should not be accessed via tab
+            // each list is a field (group) (SELECT THE FIRST)
         },
-        moveToRight() {
+        moveToRight () {
             var me = this;
             me.move({
                 toList: me.rightList,
@@ -121,7 +113,7 @@ export default {
                 fromSelection: me.leftSelection
             });
         },
-        moveToLeft() {
+        moveToLeft () {
             var me = this;
             me.move({
                 toList: me.leftList,
@@ -129,11 +121,16 @@ export default {
                 toSelection: me.leftSelection,
                 fromSelection: me.rightSelection
             });
+        },
+        sortBy (list, prop, dir) {
+            dir = dir || "",
+            dir = dir.toLowerCase();
+            dir = dir === "desc" ? -1 : 1;            
+            list.sort( (a, b) => (a[prop] > b[prop]) ? 1 * dir : ((b[prop] > a[prop]) ? -1 * dir : 0));
         }
     }
 }
 </script>
-
 <style lang="scss" rel="stylesheet">
     .in-out-selector {
         width: 700px;

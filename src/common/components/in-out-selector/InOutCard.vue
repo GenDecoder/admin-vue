@@ -1,5 +1,6 @@
 <template>
     <button 
+        tabindex="-1"
         class="in-out-card"
         v-if="!hidden"
         @click="selectDeselect"
@@ -7,18 +8,13 @@
         :class="{selected: selected, disabled: state.disabled}"
     > {{ item[displayField] }} </button>
 </template>
-
 <script>
     export default {
         inject: [
             "state",
             "valueField",
             "displayField"
-        ],
-        model: {
-            prop: "selection",
-            event: "update:selection"
-        },
+        ],     
         props: {
             selection: {
                 type: Array,
@@ -28,46 +24,49 @@
                 type: Object,
                 default: {}
             },
-            searchText: {
+            searchValue: {
                 type: String,
                 default: ""
-            }
+            }            
         },      
         computed: {
-            hidden() {
+            hidden () {
                 var me = this;
-                var isHidden = me.item[me.displayField].toLowerCase().indexOf(me.searchText.trim()) === -1
-                // isHidden && 
-                // me.state.disabled = isHidden;
-                me.$emit("adjustSize", isHidden ? -1 : 1);
-                console.log(isHidden);
-                return isHidden;
+                return me.item[me.displayField].toLowerCase().indexOf(me.searchValue.toLowerCase().trim()) === -1;
             },
             selected() {
                 var me = this;
                 return me.selection.indexOf(me.item[me.valueField]) !== -1;
             }
         },
-        // watch: {
-        //     selected(newVal, oldVal) {
-
-        //     }
-        // },
+        watch: {
+            hidden (newVal, oldVal) {
+                var me = this;
+                me.$emit("adjustSize", newVal ? -1 : 1);
+            },
+            selected (newVal, oldVal) {
+                var me = this;
+                newVal && me.hidden && me.selectDeselect();
+            },
+            searchValue (newVal, oldVal) {
+                var me = this;
+                me.selected && me.selectDeselect();
+            }
+        },
         methods: {
-            selectDeselect() {
+            selectDeselect () {
                 var me = this;
                 var value = me.item[me.valueField];
                 var index = me.selection.indexOf(value);                
                 me.selected = !me.selected;
                 index !== -1 ? me.selection.splice(index, 1) : me.selection.push(value);
-                me.$emit("update:selection", me.selection);
             }
         }        
     }
 </script>
-
 <style lang="scss" rel="stylesheet"> 
     .in-out-card {
+        width: 100%;
         cursor: pointer;        
         min-height: 30px;
         border: solid 1px;
