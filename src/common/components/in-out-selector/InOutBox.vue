@@ -45,34 +45,6 @@
                 var element;
                 var listEl = this.$el.querySelector(".list");
                 var children = listEl.querySelectorAll("button");
-
-
-                function HELLO(callback) {
-                    setTimeout(function() {
-                        callback("hello")
-                    }, 1000);                    
-                }
-
-                function WORLD(callback) {
-                    setTimeout(function() {
-                        callback("world")
-                    }, 1000);
-                    
-                }
-
-                function onClick (e) {
-                    var text = "";
-                     function textFn(a) {
-                        text = text + " " + a;
-                    }
-
-                    HELLO(textFn);
-                    WORLD(textFn);
-                    // var target = e.target;
-                    console.log(text)
-                }
-
-
                 var index = children.length;
                 while (!element) { // index --
                     typeof callback === "function" && callback();                    
