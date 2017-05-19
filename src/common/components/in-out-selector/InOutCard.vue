@@ -15,8 +15,12 @@
             "valueField",
             "displayField"
         ],
+        model: {
+            prop: "selection",
+            event: "update:selection"
+        },
         props: {
-             value: { // selection
+            selection: {
                 type: Array,
                 default: []
             },
@@ -34,13 +38,14 @@
                 var me = this;
                 var isHidden = me.item[me.displayField].toLowerCase().indexOf(me.searchText.trim()) === -1
                 // isHidden && 
+                // me.state.disabled = isHidden;
                 me.$emit("adjustSize", isHidden ? -1 : 1);
                 console.log(isHidden);
                 return isHidden;
             },
             selected() {
                 var me = this;
-                return me.value.indexOf(me.item[me.valueField]) !== -1;
+                return me.selection.indexOf(me.item[me.valueField]) !== -1;
             }
         },
         // watch: {
@@ -52,13 +57,10 @@
             selectDeselect() {
                 var me = this;
                 var value = me.item[me.valueField];
-                var index = me.value.indexOf(value);                
+                var index = me.selection.indexOf(value);                
                 me.selected = !me.selected;
-                if (index !== -1)
-                    me.value.splice(index, 1);
-                else
-                    me.value.push(value);
-                me.$emit("input", me.value);
+                index !== -1 ? me.selection.splice(index, 1) : me.selection.push(value);
+                me.$emit("update:selection", me.selection);
             }
         }        
     }

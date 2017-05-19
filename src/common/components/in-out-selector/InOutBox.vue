@@ -8,7 +8,7 @@
             <in-out-card
                 v-for="item of list"
                 :item="item"
-                v-model="value"
+                v-model="selection"
                 :key="item[valueField]"
                 :searchText="searchText"
                 @adjustSize="adjustSize"
@@ -21,8 +21,12 @@
     import InOutCard from "./InOutCard"
     export default {
         inject: ["valueField", "displayField"],
+        model: {
+            prop: "selection",
+            event: "update:selection"
+        },
         props: {
-            value: {
+            selection: {
                 type: Array,
                 default: []
             },
@@ -33,14 +37,14 @@
         },
         data() {
             return {
-                size: 0,
+                // size: 0,
                 searchText: ""
             }
         },
         methods: {
             clear() {
                 // BEST WAY TO CLEAN ARRAY IN VUE (DOES NOT AFFECT THE COMPUTED)
-                this.value.splice(0, this.value.length);
+                this.selection.splice(0, this.selection.length);
             },
             checkUnCheckAll(e) {
                 var me = this;
@@ -48,7 +52,7 @@
                 me.clear();
                 if (e.target.checked)
                     for (i = 0; i < me.list.length; i += 1) 
-                        me.value.push(me.list[i][me.valueField]);
+                        me.selection.push(me.list[i][me.valueField]);
             },
             adjustSize(plus) {
                 var me = this;
@@ -61,7 +65,7 @@
         },
         computed: {
             checkAll() {
-                return this.size > 0 && this.size === this.value.length;
+                return this.list.length > 0 && this.list.length === this.selection.length;
             }
         },
         // watch: {           

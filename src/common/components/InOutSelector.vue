@@ -30,6 +30,9 @@ export default {
         return {
             state: Object.defineProperty({}, "disabled", {
                 get: () => this.disabled
+                // set(value) {
+                //     console.log(value);
+                // }
             }),
             valueField: this.valueField,
             displayField: this.displayField
