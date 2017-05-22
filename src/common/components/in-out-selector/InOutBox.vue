@@ -5,7 +5,22 @@
         <!-- ADD A CLICK AND AN STOP PROPAGATION, WHEN THE ITEM WAS JUST MOVED -->
         <!--add ket events to the list-->
 
-        <div class="list" tabindex="0"  @keyup.down="onDown" @keyup.up="onUp" @focus="onListFocused">
+        <div 
+            class="list"
+            v-ux-ui
+            @keydown.up="onUp"
+            @keydown.down="onDown"
+
+            
+            @keydown.shift.down="onSDD"
+            @keydown.shift.up="onSUD"
+
+            @click="lastKeyEvent = ''"
+
+            @focus="onListFocused"
+
+            :tabindex="listSize ? 0 : -1"
+        >
             <in-out-card
                 v-for="item of list"
                 :item="item"
@@ -34,43 +49,98 @@
         data () {
             var me = this;
             return {
-                position: 0, // 
                 searchValue: "",
-                listSize: this.list.length
+                listSize: this.list.length,
+
+                lastKeyEvent: "",
+                backing: false,
+                base: null
             };
         },
         methods: {
-            focusCard (callback) {
-                var me = this;
-                var element;
-                var listEl = this.$el.querySelector(".list");
-                var children = listEl.querySelectorAll("button");
-                var index = children.length;
-                while (!element) { // index --
-                    typeof callback === "function" && callback();                    
-                    element = children[me.position];
+            findNext (current, where, comparator) {
+                var next;
+                var size = 10;
+                while(!next && size --) {
+                    var next = current[where];
+                    if (!next || current[comparator] !== next[comparator])
+                        next = false;
                 }
-                element && element.focus();
+                return next;
+            },           
+            onDown (e) {
+                var next = this.findNext(e.target, "nextSibling", "offsetLeft");
+                !e.shiftKey && next && next.focus();
+                if (!e.shiftKey) this.lastKeyEvent = "down";
             },
-            onDown () {
+            onUp (e) {
+                var next = this.findNext(e.target, "previousSibling", "offsetLeft");
+                !e.shiftKey && next && next.focus();   
+                if (!e.shiftKey) this.lastKeyEvent = "up";            
+            },          
+            onSDD (e) {
+                var me = this;          
+                var current = e.target;
+                var currentSelected = current.className.indexOf("selected") !== -1;
+                var next = this.findNext(current, "nextSibling", "offsetLeft");   
+                if (me.lastKeyEvent != "ctrl+down") {
+                    if (me.lastKeyEvent === "ctrl+up") {
+                        console.log("CHANGE DIR DETECTED");
+                        me.backing = !me.backing;
+                    } else 
+                        me.backing = false;
+                }
+                if (["ctrl+down", "ctrl+up"].indexOf(me.lastKeyEvent) == -1) {
+                    console.log("NEW BASE");
+                    me.base = current;
+                }
+                me.baseShift(current, currentSelected, next);
+                me.lastKeyEvent = "ctrl+down";     
+            },
+            onSUD (e) {
                 var me = this;
-                me.focusCard( () => {
-                    me.position += 1;
-                    if (me.position === me.listSize) me.position = 0;
-                } );
+                var current = e.target;
+                var currentSelected = current.className.indexOf("selected") !== -1;
+                var next = this.findNext(current, "previousSibling", "offsetLeft");
+                if (me.lastKeyEvent != "ctrl+up") {
+                    if (me.lastKeyEvent === "ctrl+down") {
+                        console.log("CHANGE DIR DETECTED");
+                        me.backing = !me.backing;
+                    } else 
+                        me.backing = false;
+                }
+                if (["ctrl+down", "ctrl+up"].indexOf(me.lastKeyEvent) == -1) {
+                    console.log("NEW BASE");
+                    me.base = current;
+                }
+                me.baseShift(current, currentSelected, next);
+                me.lastKeyEvent = "ctrl+up";                
             },
-            onUp () {
+            baseShift(current, currentSelected, next) {
                 var me = this;
-                me.focusCard( () => {
-                    me.position -= 1;
-                    if (me.position < 0) me.position = me.listSize - 1;
-                } );
+                var nextSelected = next ? next.className.indexOf("selected") !== -1 : false;
+                // FORWARD
+                if (!me.backing && !currentSelected) { current.click(); return; }
+                if (!me.backing && currentSelected && nextSelected) { next && next.focus(); return; }
+                if (!me.backing && currentSelected) { next && next.focus(); next && next.click(); return; }
+                // BACKING
+                if (me.backing && currentSelected && current == me.base && nextSelected) { next.focus(); me.backing = false; return; }
+                if (me.backing && currentSelected && current == me.base && !next) { current.click(); /*me.backing = false;*/ return; }
+                if (me.backing && currentSelected && current == me.base) { next && next.focus(); next && next.click(); me.backing = false; return; }
+                if (me.backing && currentSelected) { current.click(); next && next.focus(); return; }
             },
-            onListFocused () {
+
+            onListFocused (e) {
                 var me = this;
-                me.position = 0
-                me.focusCard();
+                var el = e.target;
+                var firstChild = el.querySelector("button"); // button pased to directive as tagEl for children
+                // SIEMPRE VERIFICAR EL TAGNAME FOR CILDREN
+                firstChild && firstChild.focus();                
+
+                me.lastKeyEvent = "focus";
+                me.backing = false;
             },
+
             cleanSelection () {
                 var me = this;
                 // BEST WAY TO CLEAN ARRAY IN VUE (DOES NOT AFFECT THE COMPUTED)
@@ -117,8 +187,11 @@
                 border-color: red;
             }
         }
-        // .list {
-        //     border: solid 1px;           
-        // }
+        .list {
+            height: 200px;
+            max-height: 200px;
+            border: solid 1px;
+            overflow-y: auto;           
+        }
     }
 </style>

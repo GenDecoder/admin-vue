@@ -66,19 +66,28 @@
 </script>
 <style lang="scss" rel="stylesheet"> 
     .in-out-card {
+
         width: 100%;
-        cursor: pointer;        
-        min-height: 30px;
-        border: solid 1px;
-        line-height: 30px;
+        height: 30px;
+        border: none;
+        text-align: left;
+        letter-spacing: 1px;
+        background-color: white;
         &.selected {
             color: white;
-            border-color: black;
-            background-color: #2364a5;
+            border-color: #e0c6c6;
+            border-bottom: solid 1px;
+            background-color: #4d5473;
+            // background-color: #ea4646;
+            &:focus {
+                opacity: 0.8;
+            }
         }
         &.disabled {
-            cursor: default;
-            background-color: lightgray;
+            cursor: no-drop;
+        }
+        &:focus {            
+            outline-color: #4d5473;          
         }
     }
 </style>

@@ -37,10 +37,22 @@
                 name: "Dealer Management"
             }, {
                 id: 3,
-                name: "ZZZZ"
+                name: "ZANPATU"
             }, {
                 id: 4,
-                name: "01023"
+                name: "012345"
+            }, {
+                id: 5,
+                name: "BOLIVIA"
+            }, {
+                id: 6,
+                name: "AJEDREZ"
+            }, {
+                id: 7,
+                name: "EJERCICIO"
+            }, {
+                id: 8,
+                name: "VUEJS"
             });
             me.selectedPermissionIds.push(1);
             me.selectedPermissionIds.push(2);

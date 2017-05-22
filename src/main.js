@@ -4,14 +4,16 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
-/**
- * Define Global Components
- */
+
+// Define Global Components
 import InOutSelector from "@/common/components/InOutSelector"
-/**
- * Register Global Components
- */
+// Register Global Components
 Vue.component("in-out-selector", InOutSelector);
+
+// Define Global Directives
+import UxUi from "@/common/directives/UxUi"
+// Register Global Directives
+Vue.directive("ux-ui", UxUi);
 
 Vue.config.productionTip = false
 
