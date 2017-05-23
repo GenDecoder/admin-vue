@@ -7,19 +7,7 @@
 
         <div 
             class="list"
-            v-ux-ui
-            @keydown.up="onUp"
-            @keydown.down="onDown"
-
-            
-            @keydown.shift.down="onSDD"
-            @keydown.shift.up="onSUD"
-
-            @click="lastKeyEvent = ''"
-
-            @focus="onListFocused"
-
-            :tabindex="listSize ? 0 : -1"
+            v-ux-ui="'button'"
         >
             <in-out-card
                 v-for="item of list"
@@ -50,97 +38,10 @@
             var me = this;
             return {
                 searchValue: "",
-                listSize: this.list.length,
-
-                lastKeyEvent: "",
-                backing: false,
-                base: null
+                listSize: this.list.length
             };
         },
         methods: {
-            findNext (current, where, comparator) {
-                var next;
-                var size = 10;
-                while(!next && size --) {
-                    var next = current[where];
-                    if (!next || current[comparator] !== next[comparator])
-                        next = false;
-                }
-                return next;
-            },           
-            onDown (e) {
-                var next = this.findNext(e.target, "nextSibling", "offsetLeft");
-                !e.shiftKey && next && next.focus();
-                if (!e.shiftKey) this.lastKeyEvent = "down";
-            },
-            onUp (e) {
-                var next = this.findNext(e.target, "previousSibling", "offsetLeft");
-                !e.shiftKey && next && next.focus();   
-                if (!e.shiftKey) this.lastKeyEvent = "up";            
-            },          
-            onSDD (e) {
-                var me = this;          
-                var current = e.target;
-                var currentSelected = current.className.indexOf("selected") !== -1;
-                var next = this.findNext(current, "nextSibling", "offsetLeft");   
-                if (me.lastKeyEvent != "ctrl+down") {
-                    if (me.lastKeyEvent === "ctrl+up") {
-                        console.log("CHANGE DIR DETECTED");
-                        me.backing = !me.backing;
-                    } else 
-                        me.backing = false;
-                }
-                if (["ctrl+down", "ctrl+up"].indexOf(me.lastKeyEvent) == -1) {
-                    console.log("NEW BASE");
-                    me.base = current;
-                }
-                me.baseShift(current, currentSelected, next);
-                me.lastKeyEvent = "ctrl+down";     
-            },
-            onSUD (e) {
-                var me = this;
-                var current = e.target;
-                var currentSelected = current.className.indexOf("selected") !== -1;
-                var next = this.findNext(current, "previousSibling", "offsetLeft");
-                if (me.lastKeyEvent != "ctrl+up") {
-                    if (me.lastKeyEvent === "ctrl+down") {
-                        console.log("CHANGE DIR DETECTED");
-                        me.backing = !me.backing;
-                    } else 
-                        me.backing = false;
-                }
-                if (["ctrl+down", "ctrl+up"].indexOf(me.lastKeyEvent) == -1) {
-                    console.log("NEW BASE");
-                    me.base = current;
-                }
-                me.baseShift(current, currentSelected, next);
-                me.lastKeyEvent = "ctrl+up";                
-            },
-            baseShift(current, currentSelected, next) {
-                var me = this;
-                var nextSelected = next ? next.className.indexOf("selected") !== -1 : false;
-                // FORWARD
-                if (!me.backing && !currentSelected) { current.click(); return; }
-                if (!me.backing && currentSelected && nextSelected) { next && next.focus(); return; }
-                if (!me.backing && currentSelected) { next && next.focus(); next && next.click(); return; }
-                // BACKING
-                if (me.backing && currentSelected && current == me.base && nextSelected) { next.focus(); me.backing = false; return; }
-                if (me.backing && currentSelected && current == me.base && !next) { current.click(); /*me.backing = false;*/ return; }
-                if (me.backing && currentSelected && current == me.base) { next && next.focus(); next && next.click(); me.backing = false; return; }
-                if (me.backing && currentSelected) { current.click(); next && next.focus(); return; }
-            },
-
-            onListFocused (e) {
-                var me = this;
-                var el = e.target;
-                var firstChild = el.querySelector("button"); // button pased to directive as tagEl for children
-                // SIEMPRE VERIFICAR EL TAGNAME FOR CILDREN
-                firstChild && firstChild.focus();                
-
-                me.lastKeyEvent = "focus";
-                me.backing = false;
-            },
-
             cleanSelection () {
                 var me = this;
                 // BEST WAY TO CLEAN ARRAY IN VUE (DOES NOT AFFECT THE COMPUTED)
